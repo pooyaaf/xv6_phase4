@@ -57,7 +57,10 @@ int             writei(struct inode*, char*, uint, uint);
 void            ideinit(void);
 void            ideintr(void);
 void            iderw(struct buf*);
-
+// semaphore.c
+void            sem_init(uint,uint);  
+void            sem_acquire(uint);   
+void            sem_release(uint);   
 // ioapic.c
 void            ioapicenable(int irq, int cpu);
 extern uchar    ioapicid;
