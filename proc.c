@@ -532,3 +532,15 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+void reentrant_spinlock_test(){
+  cprintf("spinlock init!\n");
+  struct spinlock lock;
+  initlock(&lock, "splinlock");
+  cprintf("spinlock locked !\n");
+  acquire_reentrant(&lock);
+  cprintf("spinlock re-entered!\n");
+  acquire_reentrant(&lock);
+  release(&lock);
+  cprintf("spinlock released !\n");
+}

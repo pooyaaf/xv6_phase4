@@ -41,3 +41,4 @@ int atoi(const char*);
 int sem_init(uint,uint);
 int sem_acquire(uint);
 int sem_release(uint);
+void reentrant_spinlock_test(void);

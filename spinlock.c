@@ -20,14 +20,15 @@ void initlock(struct spinlock *lk, char *name)
 // Loops (spins) until the lock is acquired.
 // Holding a lock for a long time may cause
 // other CPUs to waste time spinning to acquire it.
-void acquire(struct spinlock *lk)
+void
+acquire(struct spinlock *lk)
 {
   pushcli(); // disable interrupts to avoid deadlock.
-  if (holding(lk))
+  if(holding(lk))
     panic("acquire");
 
   // The xchg is atomic.
-  while (xchg(&lk->locked, 1) != 0)
+  while(xchg(&lk->locked, 1) != 0)
     ;
 
   // Tell the C compiler and the processor to not move loads or stores
@@ -40,6 +41,38 @@ void acquire(struct spinlock *lk)
   getcallerpcs(&lk, lk->pcs);
 }
 
+//
+void
+acquire_reentrant(struct spinlock *lk)
+{
+  pushcli(); // disable interrupts to avoid deadlock.
+    
+  if(holding(lk)){  // this_cpu = locker_cpu
+    if(lk->pid == myproc()->pid){  // it's the same process!!
+      popcli();
+      return ;
+    }else{
+      panic("acquire");  // some other process on this cpu
+    }
+  }
+
+  // The xchg is atomic.
+  while(xchg(&lk->locked, 1) != 0)
+    ;
+
+  // Tell the C compiler and the processor to not move loads or stores
+  // past this point, to ensure that the critical section's memory
+  // references happen after the lock is acquired.
+  __sync_synchronize();
+
+  // Record info about lock acquisition for debugging.
+
+  lk->cpu = mycpu();
+  lk->pid = myproc()->pid;
+  getcallerpcs(&lk, lk->pcs);
+}
+
+
 // Release the lock.
 void release(struct spinlock *lk)
 {
@@ -48,7 +81,7 @@ void release(struct spinlock *lk)
 
   lk->pcs[0] = 0;
   lk->cpu = 0;
-
+  lk->pid = 0;
   // Tell the C compiler and the processor to not move loads or stores
   // past this point, to ensure that all the stores in the critical
   // section are visible to other cores before the lock is released.
