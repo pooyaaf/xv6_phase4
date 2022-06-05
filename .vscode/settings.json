@@ -3,7 +3,14 @@
         "vector": "c",
         "param.h": "c",
         "semaphore.h": "c",
-        "spinlock.h": "c"
+        "spinlock.h": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "types.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
